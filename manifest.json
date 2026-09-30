@@ -1,0 +1,17 @@
+{
+  "name": "DBYC - Don Bosco Youth Centre",
+  "short_name": "DBYC",
+  "description": "Don Bosco Youth Centre Member Management & Attendance System",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#1a237e",
+  "theme_color": "#1a237e",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "images/dbyc-logo.jpg", "sizes": "192x192", "type": "image/jpeg" },
+    { "src": "images/dbyc-logo.jpg", "sizes": "512x512", "type": "image/jpeg" }
+  ],
+  "categories": ["education", "social"],
+  "lang": "en",
+  "scope": "/"
+}
