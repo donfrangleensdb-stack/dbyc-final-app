@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <meta name="theme-color" content="#1a237e"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="DBYC"/>
+  <title>DBYC – Don Bosco Youth Centre</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="images/dbyc-logo.jpg"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-slides">
+  <div class="bg-slide on" style="background-image:url('images/bg1.jpg')"></div>
+  <div class="bg-slide" style="background-image:url('images/bg2.jpg')"></div>
+  <div class="bg-slide" style="background-image:url('images/bg3.jpg')"></div>
+  <div class="bg-slide" style="background-image:url('images/bg4.jpg')"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ╔══════════ SPLASH ══════════╗ -->
+<div id="splash">
+  <img src="images/dbyc-logo.jpg" class="splash-logo" alt="DBYC" onerror="this.style.background='#1a237e'">
+  <div class="splash-org">DBYC</div>
+  <div class="splash-name">DON BOSCO YOUTH CENTRE</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- ╔══════════ AUTH ══════════╗ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo-row">
+      <img src="images/dbyc-logo.jpg" class="auth-logo" alt="DBYC" onerror="this.style.display='none'">
+    </div>
+    <div class="auth-title">DBYC</div>
+    <div class="auth-sub">Don Bosco Youth Centre</div>
+
+    <!-- LOGIN -->
+    <div id="login-panel">
+      <div class="form-field">
+        <label class="auth-label">Member ID / Mobile</label>
+        <input type="text" id="loginUser" class="auth-input" placeholder="DBYC0001 or mobile number">
+      </div>
+      <div class="form-field">
+        <label class="auth-label">Password</label>
+        <input type="password" id="loginPass" class="auth-input" placeholder="Enter password">
+      </div>
+      <button class="auth-btn" onclick="doLogin()">🔐 Sign In</button>
+      <div class="auth-divider">— New Member? —</div>
+      <button class="auth-btn-outline" onclick="showPanel('register')">📝 Register Now</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register-panel" style="display:none">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="font-size:0.85rem;font-weight:800;color:#1a237e">உறுப்பினர் புதுச்சேர்தல் விண்ணப்பம்</div>
+        <div style="font-size:0.72rem;color:#607d8b">Member Enrollment Application – DBYC, Perin Palam, Chennai – 600 017</div>
+      </div>
+      <div class="photo-upload-box" onclick="document.getElementById('rPhoto').click()">
+        <img id="rPhotoPreview" class="photo-preview-circle" style="display:none" alt="">
+        <div id="rPhotoHint" style="font-size:0.82rem;color:#1565c0">📷 Upload Profile Photo / படம்</div>
+      </div>
+      <input type="file" id="rPhoto" accept="image/*" style="display:none" onchange="prevPhoto(this,'rPhotoPreview','rPhotoHint')">
+      <div class="form-field"><label class="auth-label">1. Full Name * / பெயர்</label><input type="text" id="rName" class="auth-input" placeholder="Your full name / உங்கள் முழு பெயர்"></div>
+      <div style="display:grid;grid-template-columns:3fr 2fr;gap:8px">
+        <div class="form-field"><label class="auth-label">2. Date of Birth * / பிறந்த தேதி</label><input type="date" id="rDob" class="auth-input" onchange="autoCalcAge()"></div>
+        <div class="form-field"><label class="auth-label">Age / வயது</label><input type="number" id="rAge" class="auth-input" placeholder="Age" readonly style="background:#f0f0f0"></div>
+      </div>
+      <div class="form-field"><label class="auth-label">3. Education Qualification / கல்வித் தகுதி</label><input type="text" id="rEducation" class="auth-input" placeholder="e.g. 10th Std, B.Com, Engineering..."></div>
+      <div class="form-field"><label class="auth-label">Mobile * / தொடர்பு எண்</label><input type="tel" id="rMobile" class="auth-input" placeholder="Mobile number"></div>
+      <div class="form-field"><label class="auth-label">Email ID / மின்னஞ்சல்</label><input type="email" id="rEmail" class="auth-input" placeholder="your@email.com"></div>
+      <div class="form-field"><label class="auth-label">Instagram ID / இன்ஸ்டா Id</label><input type="text" id="rInsta" class="auth-input" placeholder="@username (optional)"></div>
+      <div class="form-field"><label class="auth-label">4. School / College / Work Address / கல்வி பயிலும் இடம்</label><textarea id="rSchoolAddr" class="auth-input" style="resize:vertical;min-height:55px" placeholder="School / College / Workplace name and address"></textarea></div>
+      <div class="form-field"><label class="auth-label">5. Religion / மதம்</label>
+        <select id="rReligion" class="auth-input">
+          <option value="">Select / தேர்வு செய்க</option>
+          <option value="Catholic">Catholic / கத்தோலிக்கர்</option>
+          <option value="Christian">Christian / கிறிஸ்தவர்</option>
+          <option value="Hindu">Hindu / இந்து</option>
+          <option value="Muslim">Muslim / இஸ்லாமியர்</option>
+          <option value="Other">Other / மற்றவை</option>
+        </select>
+      </div>
+      <div class="form-field"><label class="auth-label">6. Marital Status / திருமண நிலை</label>
+        <div style="display:flex;gap:16px;padding:8px 0">
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer"><input type="radio" name="rMarital" id="rMaritalNo" value="Unmarried" checked> Unmarried / திருமணமாகாதவர் ☐</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer"><input type="radio" name="rMarital" id="rMaritalYes" value="Married"> Married / திருமணமானவர் ☐</label>
+        </div>
+      </div>
+      <div class="form-field"><label class="auth-label">7. Home Address * / வீட்டு முகவரி</label><textarea id="rAddress" class="auth-input" style="resize:vertical;min-height:65px" placeholder="Full home address, Perin Palam, Chennai – 600 017"></textarea></div>
+      <div class="form-field"><label class="auth-label">8. Father's Name / தந்தையின் பெயர்</label><input type="text" id="rFather" class="auth-input" placeholder="Father's full name"></div>
+      <div class="form-field"><label class="auth-label">Father's Occupation / தந்தையின் தொழில்</label><input type="text" id="rFatherOccup" class="auth-input" placeholder="Father's job / occupation"></div>
+      <div class="form-field"><label class="auth-label">9. Mother's Name / தாயின் பெயர்</label><input type="text" id="rMother" class="auth-input" placeholder="Mother's full name"></div>
+      <div class="form-field"><label class="auth-label">10. Years as Member / உறுப்பினராக எத்தனை வருடம்</label><input type="number" id="rYearsInOrg" class="auth-input" placeholder="0 (enter 0 if new member)" min="0" value="0"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="form-field"><label class="auth-label">11. Brothers / சகோதரர்கள் (அண்ணன்/தம்பி)</label><input type="number" id="rBrothers" class="auth-input" placeholder="Count" min="0" value="0"></div>
+        <div class="form-field"><label class="auth-label">Sisters / சகோதரிகள்</label><input type="number" id="rSisters" class="auth-input" placeholder="Count" min="0" value="0"></div>
+      </div>
+      <div class="form-field"><label class="auth-label">12. Siblings in DBYC / சகோதரர்கள் மன்றத்தில் இருந்தால் குறிப்பிடு</label><input type="text" id="rSiblingsDbyc" class="auth-input" placeholder="Names of siblings who are DBYC members"></div>
+      <div class="form-field"><label class="auth-label">13. Purpose of Joining / மன்றத்தில் சேருவதன் நோக்கம்</label><textarea id="rPurpose" class="auth-input" style="resize:vertical;min-height:65px" placeholder="Why do you want to join DBYC? / ஏன் சேர விரும்புகிறீர்கள்?"></textarea></div>
+      <div class="form-field">
+        <label class="auth-label">14. Activities Interested In / மன்றத்தில் நீங்கள் செய்ய விரும்புவது</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;background:#f7f9ff;border-radius:10px;border:1.5px solid #c5cae9">
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActSports" style="accent-color:#1a237e"> 🏃 Sports</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActMusic" style="accent-color:#1a237e"> 🎵 Music / இசை</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActDrama" style="accent-color:#1a237e"> 🎭 Drama</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActDance" style="accent-color:#1a237e"> 💃 Dance</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActService" style="accent-color:#1a237e"> 🤝 Social Service</label>
+          <label style="display:flex;align-items:center;gap=6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActPrayer" style="accent-color:#1a237e"> 🙏 Prayer</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActLeadership" style="accent-color:#1a237e"> 👑 Leadership</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActExercise" style="accent-color:#1a237e"> 💪 Morning Exercise</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActArt" style="accent-color:#1a237e"> 🎨 Art / Craft</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#333;cursor:pointer"><input type="checkbox" id="rActOther" style="accent-color:#1a237e"> ✨ Other / இதர</label>
+        </div>
+      </div>
+      <div class="form-field"><label class="auth-label">15. Future Plans / எதிர்கால திட்டம்</label><textarea id="rFuturePlans" class="auth-input" style="resize:vertical;min-height:60px" placeholder="Your future goals and aspirations / உங்கள் இலக்குகள்"></textarea></div>
+      <div class="form-field"><label class="auth-label">16. Other Group / Section / இதர பிரிவு</label><input type="text" id="rOtherGroup" class="auth-input" placeholder="Any other group or section you belong to"></div>
+      <div class="form-field"><label class="auth-label">Special Skills / Talents / சிறப்புத் திறன்கள்</label><input type="text" id="rSkills" class="auth-input" placeholder="e.g. Painting, Computers, Public Speaking..."></div>
+      <div class="form-field"><label class="auth-label">Password * / கடவுச்சொல்</label><input type="password" id="rPass" class="auth-input" placeholder="Create a strong password / கடவுச்சொல் உருவாக்கவும்"></div>
+      <div style="background:#e8f5e9;border-radius:12px;padding:14px;margin-bottom:14px;border:2px solid #a5d6a7">
+        <div style="font-size:0.88rem;font-weight:800;color:#1b5e20;margin-bottom:8px">📜 DBYC Rules Agreement / விதிமுறை ஒப்புதல்</div>
+        <div style="font-size:0.76rem;color:#2e7d32;line-height:1.8;margin-bottom:10px">
+          ✅ I will maintain minimum <b>75% attendance</b> at all meetings<br>
+          ✅ Meeting times: Weekdays <b>4:30 PM – 7:30 PM</b> | Saturday <b>4:00 – 6:00 PM</b><br>
+          ✅ I will follow proper dress code and discipline at all times<br>
+          ✅ I will respect all leaders, members and elders<br>
+          ✅ I will actively participate in all events &amp; activities<br>
+          ✅ I will uphold the values and mission of St. John Bosco<br>
+          ✅ I agree that violation of rules may result in suspension
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <input type="checkbox" id="rRulesAgree" style="width:20px;height:20px;accent-color:#2e7d32">
+          <span style="font-size:0.82rem;font-weight:700;color:#1a237e">I agree to all DBYC Rules &amp; Regulations ✅<br><span style="font-size:0.68rem;color:#607d8b">/ நான் அனைத்து விதிமுறைகளுக்கும் உடன்படுகிறேன்</span></span>
+        </label>
+      </div>
+      <button class="auth-btn" onclick="doRegister()">✅ Submit Enrollment / பதிவு செய்க</button>
+      <div style="text-align:center;margin:10px 0">
+        <button onclick="showPanel('rules')" style="background:none;border:none;color:#1565c0;font-size:0.82rem;cursor:pointer;text-decoration:underline">📜 Read Full DBYC Rules &amp; Regulations →</button>
+      </div>
+      <div class="auth-divider">— Already a member? —</div>
+      <button class="auth-btn-outline" onclick="showPanel('login')">← Back to Login</button>
+    </div>
+
+    <!-- RULES PANEL -->
+    <div id="rules-panel" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <img src="images/dbyc-logo.jpg" style="width:60px;height:60px;border-radius:50%;border:3px solid #1a237e;object-fit:cover" alt="" onerror="this.style.display='none'">
+        <div style="font-size:1rem;font-weight:900;color:#1a237e;margin-top:8px">DBYC Rules &amp; Regulations</div>
+        <div style="font-size:0.72rem;color:#607d8b">தொன்போஸ்கோ இளைஞர் மன்றத்தின் விதிமுறைகள்</div>
+        <div style="font-size:0.68rem;color:#607d8b">பேரின் பாலம், சென்னை – 600 017</div>
+      </div>
+      <div id="rulesContent"></div>
+      <button class="auth-btn" onclick="showPanel('register')" style="margin-top:16px">← Back to Registration</button>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ╔══════════ APP ══════════╗ -->
+<div id="app">
+
+  <!-- ── HEADER ── -->
+  <div class="app-header" id="appHeader">
+    <div class="header-top">
+      <button class="header-menu-btn" onclick="toggleDrawer(true)">☰</button>
+      <div class="header-logo-center">
+        <img src="images/dbyc-logo.jpg" class="header-logo-img" alt="DBYC" onerror="this.style.display='none'">
+        <div class="header-title-block">
+          <div class="header-title">D B Y C</div>
+          <div class="header-subtitle">Don Bosco Youth Centre</div>
+        </div>
+      </div>
+      <button class="header-notif-btn" onclick="goPage('notifications')">
+        🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span>
+      </button>
+    </div>
+    <div class="header-banner" id="headerBanner">
+      <img src="images/bg3.jpg" alt="DBYC Banner" style="width:100%;height:100%;object-fit:cover">
+      <div class="header-banner-overlay">
+        <div class="header-banner-text">
+          <div class="header-banner-label">DBYC</div>
+          <div class="header-banner-title">Don Bosco<br>Youth Centre</div>
+          <div class="header-banner-sub">Building Young Lives</div>
+        </div>
+      </div>
+    </div>
+    <div class="news-ticker">
+      <div class="news-ticker-label">📣 News</div>
+      <div class="news-ticker-track"><div class="news-ticker-text" id="tickerText">Welcome to Don Bosco Youth Centre! 🙏 God bless all our members!</div></div>
+    </div>
+  </div>
+
+  <!-- ── MAIN SCROLL ── -->
+  <div class="main-scroll" id="mainScroll">
+
+    <!-- PAGE: HOME -->
+    <div class="page active" id="page-home">
+      <!-- Welcome Card -->
+      <div class="welcome-card" id="welcomeCard">
+        <div id="welcomeAvatarWrap" onclick="goPage('profile')"></div>
+        <div class="welcome-text">
+          <div class="welcome-greeting" id="wcGreeting">Welcome,</div>
+          <div class="welcome-name" id="wcName">Loading...</div>
+          <div class="welcome-role" id="wcRole"></div>
+          <div class="welcome-id" id="wcId"></div>
+          <div class="welcome-att" id="wcAtt"></div>
+        </div>
+      </div>
+
+      <!-- Birthday Banner (shown only when someone has birthday today) -->
+      <div id="homeBirthdayBanner"></div>
+
+      <!-- Stats Row -->
+      <div class="section-pad" style="padding-top:8px;padding-bottom:0">
+        <div id="homeDashStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px"></div>
+      </div>
+
+      <!-- Quick Icon Grid -->
+      <div class="section-pad" style="padding-top:8px">
+        <div class="section-label">⚡ Quick Access</div>
+        <div class="icon-grid">
+          <div class="icon-tile" onclick="goPage('profile')">
+            <div class="icon-tile-box tile-orange">👤</div>
+            <div class="icon-tile-label">My Profile</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('members')">
+            <div class="icon-tile-box tile-pink">👥</div>
+            <div class="icon-tile-label">Members</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('qr')">
+            <div class="icon-tile-box tile-blue">📱</div>
+            <div class="icon-tile-label">My QR</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('attendance')">
+            <div class="icon-tile-box tile-teal">📋</div>
+            <div class="icon-tile-label">Attendance</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('scanner')">
+            <div class="icon-tile-box tile-green">📷</div>
+            <div class="icon-tile-label">QR Scanner</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('idcard')">
+            <div class="icon-tile-box tile-indigo">🪪</div>
+            <div class="icon-tile-label">ID Card</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('certificates')">
+            <div class="icon-tile-box tile-amber">🏅</div>
+            <div class="icon-tile-label">Certificates</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('points')">
+            <div class="icon-tile-box tile-purple">⭐</div>
+            <div class="icon-tile-label">Points &amp; Levels</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('events')">
+            <div class="icon-tile-box tile-rose">🎉</div>
+            <div class="icon-tile-label">Events</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('birthdays')">
+            <div class="icon-tile-box tile-brown">🎂</div>
+            <div class="icon-tile-label">Birthdays</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('news')">
+            <div class="icon-tile-box tile-cyan">📰</div>
+            <div class="icon-tile-label">News &amp; Updates</div>
+            <div class="tile-badge" id="newsBadge" style="display:none">0</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('reports')" id="adminTile" style="display:none">
+            <div class="icon-tile-box tile-navy">📊</div>
+            <div class="icon-tile-label">Admin Panel</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('rules')">
+            <div class="icon-tile-box tile-violet">📜</div>
+            <div class="icon-tile-label">Rules &amp; Constitution</div>
+          </div>
+          <div class="icon-tile" onclick="goPage('minutes')">
+            <div class="icon-tile-box tile-deep-orange">📝</div>
+            <div class="icon-tile-label">DBYC Minutes<span class="tile-badge" id="minutesBadge" style="display:none">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Birthdays / Upcoming Section -->
+      <div class="section-pad" style="padding-top:0">
+        <div class="section-label">🎂 Upcoming Birthdays</div>
+        <div class="white-card" style="margin:0;padding:12px 16px">
+          <div id="homeUpcomingBdays"><div class="empty-msg" style="font-size:0.8rem">Loading...</div></div>
+          <button onclick="goPage('birthdays')" style="width:100%;margin-top:10px;padding:8px;background:#e8eaf6;color:#1a237e;border:none;border-radius:10px;font-size:0.82rem;font-weight:700;cursor:pointer">View All Birthdays →</button>
+        </div>
+      </div>
+
+      <!-- Recent News -->
+      <div class="section-pad" style="padding-top:0">
+        <div class="section-label">📰 Recent News</div>
+        <div class="white-card" style="margin:0;padding:12px 16px">
+          <div id="homeRecentNews"><div class="empty-msg" style="font-size:0.8rem">Loading...</div></div>
+          <button onclick="goPage('news')" style="width:100%;margin-top:10px;padding:8px;background:#e8eaf6;color:#1a237e;border:none;border-radius:10px;font-size:0.82rem;font-weight:700;cursor:pointer">View All News →</button>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div class="section-pad" style="padding-top:0">
+        <div class="section-label">📣 Announcements</div>
+        <div class="white-card" style="margin:0;padding:12px 16px">
+          <div id="homeAnnouncements"><div class="empty-msg">Loading...</div></div>
+        </div>
+      </div>
+      <div style="height:16px"></div>
+    </div><!-- /home -->
+
+    <!-- PAGE: DBYC RULES -->
+    <div class="page" id="page-rules">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📜 Rules &amp; Constitution</span>
+      </div>
+      <div style="padding:14px">
+        <div style="background:linear-gradient(135deg,#1a237e,#283593);border-radius:14px;padding:16px;text-align:center;margin-bottom:14px;color:#fff">
+          <img src="images/dbyc-logo.jpg" style="width:64px;height:64px;border-radius:50%;border:3px solid var(--dbyc-gold);object-fit:cover;display:block;margin:0 auto 10px" onerror="this.style.display='none'" alt="">
+          <div style="font-size:1rem;font-weight:900;color:var(--dbyc-gold)">தொன்போஸ்கோ இளைஞர் மன்றம்</div>
+          <div style="font-size:0.82rem;color:#aab4e8">Don Bosco Youth Centre</div>
+          <div style="font-size:0.75rem;color:#aab4e8">பேரின் பாலம், சென்னை – 600 017</div>
+          <div style="font-size:0.78rem;color:var(--dbyc-gold);margin-top:8px;font-style:italic">"Give me souls, take away the rest." – St. John Bosco</div>
+        </div>
+        <!-- Age Groups Table -->
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">👥 Age Groups / வயது குழுக்கள்</div>
+          <div id="rulesGroupTable"></div>
+        </div>
+        <!-- Rules List -->
+        <div id="rulesAppList"></div>
+        <!-- Physical form link -->
+        <div class="white-card" style="margin:0 0 14px;text-align:center">
+          <div style="font-size:0.82rem;color:#1a237e;font-weight:700;margin-bottom:8px">📋 Physical Enrollment Form</div>
+          <img src="images/reg-form.jpg" style="width:100%;border-radius:10px;border:2px solid var(--dbyc-border)" alt="Enrollment Form" onerror="this.style.display='none'">
+          <div style="font-size:0.7rem;color:var(--dbyc-muted);margin-top:6px">உறுப்பினர் புதுச்சேர்தல் விண்ணப்பம்</div>
+        </div>
+        <div class="white-card" style="margin:0">
+          <div style="font-size:0.82rem;color:#1a237e;font-weight:700;margin-bottom:8px">📜 Official Rules Document</div>
+          <img src="images/rules.jpg" style="width:100%;border-radius:10px;border:2px solid var(--dbyc-border)" alt="Rules Document" onerror="this.style.display='none'">
+          <div style="font-size:0.7rem;color:var(--dbyc-muted);margin-top:6px">விதிமுறைகள் ஆவணம்</div>
+        </div>
+      </div>
+    </div><!-- /rules -->
+
+    <!-- PAGE: DBYC MINUTES -->
+    <div class="page" id="page-minutes">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📝 DBYC Minutes</span>
+        <button class="btn-sm btn-blue-sm" id="minutesAddBtn" onclick="openAddMinutes()" style="display:none">+ Add</button>
+      </div>
+      <div style="padding:14px">
+        <!-- Header banner -->
+        <div style="background:linear-gradient(135deg,#e65100,#ff8f00);border-radius:14px;padding:14px;text-align:center;margin-bottom:14px;color:#fff">
+          <div style="font-size:1.6rem">📋</div>
+          <div style="font-size:0.9rem;font-weight:900;margin-top:4px">Meeting Minutes</div>
+          <div style="font-size:0.72rem;opacity:0.9">Official records of DBYC meetings</div>
+          <div style="font-size:0.7rem;opacity:0.8;margin-top:4px">"In minutes we capture decisions that shape our future"</div>
+        </div>
+        <!-- Minutes list -->
+        <div id="minutesList"><div class="empty-msg">Loading...</div></div>
+        <div style="height:20px"></div>
+      </div>
+    </div><!-- /minutes -->
+
+    <!-- PAGE: BIRTHDAYS (Enhanced) - replace existing -->
+    <div class="page" id="page-birthdays">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🎂 Birthdays</span>
+      </div>
+      <div style="padding:14px">
+        <!-- Today's birthday hero -->
+        <div id="bdayTodaySection"></div>
+        <!-- This month -->
+        <div style="font-size:0.72rem;font-weight:800;color:#607d8b;letter-spacing:1px;margin-bottom:8px">
+          THIS MONTH'S BIRTHDAYS
+        </div>
+        <div id="birthdayList"><div class="empty-msg">Loading...</div></div>
+        <!-- Upcoming all months -->
+        <div style="font-size:0.72rem;font-weight:800;color:#607d8b;letter-spacing:1px;margin:16px 0 8px">
+          UPCOMING BIRTHDAYS (Next 30 days)
+        </div>
+        <div id="bdayUpcomingList"><div class="empty-msg">Loading...</div></div>
+        <div style="height:20px"></div>
+      </div>
+    </div><!-- /birthdays -->
+
+    <!-- PAGE: NEWS & UPDATES (Enhanced) -->
+    <div class="page" id="page-news">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📰 News &amp; Updates</span>
+        <button class="btn-sm btn-blue-sm" id="newsAddBtn" onclick="openAddNews()" style="display:none">+ Post</button>
+      </div>
+      <div style="padding:14px">
+        <!-- Filter tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px">
+          <button class="filter-chip filter-active" onclick="filterNews(this,'all')">All</button>
+          <button class="filter-chip" onclick="filterNews(this,'General')">🗞️ General</button>
+          <button class="filter-chip" onclick="filterNews(this,'Event')">🎉 Events</button>
+          <button class="filter-chip" onclick="filterNews(this,'Sports')">🏃 Sports</button>
+          <button class="filter-chip" onclick="filterNews(this,'Prayer')">🙏 Prayer</button>
+          <button class="filter-chip" onclick="filterNews(this,'Achievement')">🏆 Achievement</button>
+        </div>
+        <div id="newsList"><div class="empty-msg">Loading...</div></div>
+        <div style="height:20px"></div>
+      </div>
+    </div><!-- /news -->
+
+    <!-- PAGE: NOTIFICATIONS (Enhanced) -->
+    <div class="page" id="page-notifications">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🔔 Notifications</span>
+        <button class="btn-sm" id="markReadBtn" onclick="markAllNotifsRead()" style="background:#e8f5e9;color:#2e7d32;display:none;font-size:0.72rem;padding:4px 10px;border-radius:10px;border:none;cursor:pointer">✓ Mark All Read</button>
+      </div>
+      <div style="padding:14px">
+        <div id="notifList"><div class="empty-msg">Loading...</div></div>
+        <div style="height:20px"></div>
+      </div>
+    </div><!-- /notifications -->
+
+
+    <div class="page" id="page-profile">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">👤 My Profile</span>
+        <button class="btn-sm btn-gold-sm" onclick="openEditProfileModal()">✏️ Edit</button>
+      </div>
+      <div style="padding:14px">
+        <div style="background:linear-gradient(135deg,#1a237e,#3949ab);border-radius:18px;padding:20px;text-align:center;margin-bottom:14px;position:relative">
+          <div id="profilePhotoWrap" onclick="triggerProfilePhotoChange()" style="position:relative;display:inline-block;cursor:pointer">
+            <div id="profilePhotoEl"></div>
+            <div style="position:absolute;bottom:0;right:0;background:var(--dbyc-gold);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#1a237e;font-weight:800">✏️</div>
+          </div>
+          <input type="file" id="profilePhotoFileInput" accept="image/*" style="display:none" onchange="onProfilePhotoChange(this)">
+          <div id="profileNameEl" style="font-size:1.3rem;font-weight:900;color:#fff;margin-top:12px"></div>
+          <div id="profileRoleEl" style="font-size:0.85rem;color:var(--dbyc-gold);margin-top:4px"></div>
+          <div id="profileIdEl" style="font-size:0.72rem;color:#aab4e8;margin-top:2px"></div>
+          <div id="profileJoinEl" style="font-size:0.7rem;color:#aab4e8;margin-top:2px"></div>
+        </div>
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">📊 Attendance Overview</div>
+          <div class="att-summary" id="profileAttSummary"></div>
+          <div class="progress-bar"><div class="progress-fill" id="profileAttBar" style="width:0%"></div></div>
+          <div style="font-size:0.72rem;color:var(--dbyc-muted);text-align:right;margin-top:4px" id="profileAttPct"></div>
+        </div>
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">📋 Personal Information</div>
+          <div id="profileInfoGrid"></div>
+        </div>
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">🏆 Points & Level</div>
+          <div id="profilePointsSection"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:0 0 10px">
+          <button class="btn-primary" onclick="goPage('qr')">📱 View My QR Code</button>
+          <button class="btn-primary" onclick="goPage('idcard')">🪪 View ID Card</button>
+          <button class="btn-secondary" onclick="openEditProfileModal()">✏️ Edit Profile</button>
+        </div>
+      </div>
+    </div><!-- /profile -->
+
+    <!-- PAGE: MEMBERS -->
+    <div class="page" id="page-members">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">👥 Members</span>
+        <button class="btn-sm btn-gold-sm" id="addMemberBtn" onclick="openAddMemberModal()" style="display:none">+ Add</button>
+      </div>
+      <div style="padding:10px 14px 0;display:flex;gap:8px">
+        <input type="text" id="memberSearchInput" class="search-input" placeholder="🔍 Search name, ID, group..." oninput="renderMemberList()">
+        <select id="memberGroupFilter" class="form-select" style="max-width:120px;border-radius:24px" onchange="renderMemberList()">
+          <option value="">All</option>
+          <option value="Sub-Junior">Sub-Jr</option>
+          <option value="Junior">Junior</option>
+          <option value="Senior">Senior</option>
+          <option value="Inter">Inter</option>
+          <option value="Super-Senior">Super-Sr</option>
+          <option value="Elder">Elder</option>
+        </select>
+      </div>
+      <div style="padding:10px 14px 0">
+        <div class="white-card" style="margin:0">
+          <div id="memberListEl"><div class="empty-msg">Loading...</div></div>
+        </div>
+      </div>
+    </div><!-- /members -->
+
+    <!-- PAGE: ATTENDANCE -->
+    <div class="page" id="page-attendance">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📋 Attendance</span>
+      </div>
+      <div style="padding:14px">
+        <div style="display:flex;gap:8px;background:#fff;border-radius:12px;padding:4px;margin-bottom:14px;box-shadow:var(--dbyc-shadow)">
+          <button class="btn-sm btn-blue-sm" style="flex:1;border-radius:10px" onclick="switchAttTab('my')">My Record</button>
+          <button class="btn-sm" id="btnMarkTab" style="flex:1;border-radius:10px;background:#f0f4ff;color:#1a237e" onclick="switchAttTab('mark')">Mark</button>
+          <button class="btn-sm" id="btnGroupTab" style="flex:1;border-radius:10px;background:#f0f4ff;color:#1a237e" onclick="switchAttTab('group')">Group</button>
+        </div>
+        <div id="attMyPanel">
+          <div class="white-card" style="margin:0 0 14px">
+            <div class="card-title">📊 My Summary</div>
+            <div class="att-summary" id="myAttBoxes"></div>
+            <div class="progress-bar"><div class="progress-fill" id="myAttBar" style="width:0%"></div></div>
+            <div style="text-align:right;font-size:0.72rem;color:var(--dbyc-muted);margin-top:4px" id="myAttPct"></div>
+          </div>
+          <div class="white-card" style="margin:0 0 14px">
+            <div class="card-title">📅 This Month</div>
+            <div id="myAttCalendar"></div>
+          </div>
+          <div class="white-card" style="margin:0">
+            <div class="card-title">🕓 Recent Sessions</div>
+            <div id="myAttRecent"></div>
+          </div>
+        </div>
+        <div id="attMarkPanel" style="display:none">
+          <div class="white-card" style="margin:0">
+            <div class="card-title">✅ Mark Attendance</div>
+            <div class="form-field"><label class="form-label">Session Name</label><input type="text" id="attSessionInput" class="form-input" placeholder="e.g. Sunday Meeting"></div>
+            <div class="form-field"><label class="form-label">Date</label><input type="date" id="attDateInput" class="form-input"></div>
+            <div class="form-field"><label class="form-label">Member</label><select id="attMemberSel" class="form-select"></select></div>
+            <div class="form-field"><label class="form-label">Status</label>
+              <select id="attStatusSel" class="form-select">
+                <option value="present">✅ Present</option>
+                <option value="late">⏰ Late</option>
+                <option value="absent">❌ Absent</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="doMarkAtt()">💾 Save</button>
+          </div>
+        </div>
+        <div id="attGroupPanel" style="display:none">
+          <div class="white-card" style="margin:0">
+            <div class="card-title">👥 Group Attendance</div>
+            <div class="form-field"><label class="form-label">Group</label>
+              <select id="groupAttSel" class="form-select">
+                <option>Sub-Junior</option><option>Junior</option><option>Senior</option>
+                <option>Inter</option><option>Super-Senior</option><option>Elder</option>
+              </select>
+            </div>
+            <div class="form-field"><label class="form-label">Session</label><input type="text" id="groupAttSession" class="form-input" placeholder="Session name"></div>
+            <div class="form-field"><label class="form-label">Date</label><input type="date" id="groupAttDate" class="form-input"></div>
+            <button class="btn-primary" style="margin-bottom:10px" onclick="loadGroupAttList()">Load Members</button>
+            <div id="groupAttListEl"></div>
+            <button class="btn-gold" onclick="saveGroupAtt()">💾 Save All</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /attendance -->
+
+    <!-- PAGE: QR CODE -->
+    <div class="page" id="page-qr">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📱 My QR Code</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0 0 14px;text-align:center">
+          <div class="card-title" style="justify-content:center">🆔 Scan this for Check-in</div>
+          <div class="qr-box"><div class="qr-inner" id="myQRContainer"></div></div>
+          <div style="font-size:0.8rem;color:var(--dbyc-muted);margin-top:8px" id="qrMemberInfo"></div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap">
+            <button class="btn-sm btn-blue-sm" onclick="downloadMyQR()">⬇️ Download</button>
+            <button class="btn-sm btn-gold-sm" onclick="goPage('idcard')">🪪 ID Card</button>
+          </div>
+        </div>
+        <div class="white-card" style="margin:0">
+          <div class="card-title">⚙️ Generate for Member</div>
+          <div class="form-field"><label class="form-label">Select Member</label><select id="genQRMemberSel" class="form-select"></select></div>
+          <button class="btn-primary" onclick="generateForMember()">Generate QR</button>
+          <div id="genQRResult" style="margin-top:14px;text-align:center"></div>
+        </div>
+      </div>
+    </div><!-- /qr -->
+
+    <!-- PAGE: SCANNER -->
+    <div class="page" id="page-scanner">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home');stopScanner()">←</button>
+        <span class="inner-title">📷 QR Scanner</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">📷 Scan QR for Check-in</div>
+          <div id="scannerStartArea">
+            <div style="text-align:center;padding:10px 0 14px">
+              <div style="font-size:3rem;margin-bottom:8px">📷</div>
+              <div style="font-size:0.85rem;color:var(--dbyc-muted);margin-bottom:14px">Point camera at member's QR code to check in</div>
+              <button class="btn-primary" style="max-width:220px;margin:0 auto" onclick="startScanner()">📷 Start Camera</button>
+            </div>
+          </div>
+          <div id="scannerActiveArea" style="display:none">
+            <video id="scanVideo" style="width:100%;border-radius:10px;border:2px solid var(--dbyc-blue)" autoplay muted playsinline></video>
+            <button class="btn-danger" style="margin-top:10px" onclick="stopScanner()">⏹ Stop</button>
+          </div>
+        </div>
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">✏️ Manual Check-in</div>
+          <div class="form-field"><label class="form-label">Member ID</label><input type="text" id="manualId" class="form-input" placeholder="e.g. DBYC0001"></div>
+          <div class="form-field"><label class="form-label">Session</label><input type="text" id="manualSession" class="form-input" placeholder="e.g. Sunday Meeting" value="QR Check-in"></div>
+          <button class="btn-primary" onclick="doManualCheckin()">✅ Check In</button>
+        </div>
+        <div id="checkinResultArea"></div>
+      </div>
+    </div><!-- /scanner -->
+
+    <!-- PAGE: ID CARD -->
+    <div class="page" id="page-idcard">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🪪 ID Cards</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="form-field"><label class="form-label">Select Member</label><select id="idcardMemberSel" class="form-select" onchange="renderIDCardPreview()"></select></div>
+          <div id="idcardPreview" style="margin-top:10px"></div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn-sm btn-blue-sm" onclick="downloadIDCard()">⬇️ Download</button>
+            <button class="btn-sm btn-gold-sm" onclick="printIDCard()">🖨️ Print</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /idcard -->
+
+    <!-- PAGE: CERTIFICATES -->
+    <div class="page" id="page-certificates">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🏅 Certificates</span>
+      </div>
+      <div style="padding:14px">
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="btn-sm btn-blue-sm" onclick="setCertTab('att')" style="flex:1">📋 Attendance</button>
+          <button class="btn-sm" style="flex:1;background:#f0f4ff;color:#1a237e" onclick="setCertTab('mem')">🎖️ Membership</button>
+          <button class="btn-sm" style="flex:1;background:#f0f4ff;color:#1a237e" onclick="setCertTab('merit')">⭐ Merit</button>
+        </div>
+        <div id="certAttPanel">
+          <div class="white-card" style="margin:0 0 14px">
+            <div class="card-title">📋 Attendance Certificate</div>
+            <div class="form-field"><label class="form-label">Member</label><select id="certAttSel" class="form-select"></select></div>
+            <div class="form-field"><label class="form-label">Period</label>
+              <select id="certAttPeriod" class="form-select"><option>This Month</option><option>This Year</option><option>All Time</option></select>
+            </div>
+            <button class="btn-primary" onclick="makeCert('att')">🎓 Generate</button>
+          </div>
+          <div id="certAttPreview"></div>
+        </div>
+        <div id="certMemPanel" style="display:none">
+          <div class="white-card" style="margin:0 0 14px">
+            <div class="card-title">🎖️ Membership Certificate</div>
+            <div class="form-field"><label class="form-label">Member</label><select id="certMemSel" class="form-select"></select></div>
+            <button class="btn-primary" onclick="makeCert('mem')">🎓 Generate</button>
+          </div>
+          <div id="certMemPreview"></div>
+        </div>
+        <div id="certMeritPanel" style="display:none">
+          <div class="white-card" style="margin:0 0 14px">
+            <div class="card-title">⭐ Merit Certificate</div>
+            <div class="form-field"><label class="form-label">Member</label><select id="certMeritSel" class="form-select"></select></div>
+            <div class="form-field"><label class="form-label">Achievement</label><input type="text" id="certMeritReason" class="form-input" placeholder="e.g. Best Leader 2026"></div>
+            <button class="btn-primary" onclick="makeCert('merit')">🎓 Generate</button>
+          </div>
+          <div id="certMeritPreview"></div>
+        </div>
+      </div>
+    </div><!-- /certs -->
+
+    <!-- PAGE: POINTS -->
+    <div class="page" id="page-points">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">⭐ Points & Levels</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">⭐ My Points</div>
+          <div id="myPointsSection"></div>
+        </div>
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">🏆 Leaderboard</div>
+          <div id="leaderboardEl"></div>
+        </div>
+        <div class="white-card" style="margin:0">
+          <div class="card-title">📊 Level System</div>
+          <div id="levelSystemEl"></div>
+        </div>
+      </div>
+    </div><!-- /points -->
+
+    <!-- PAGE: EVENTS -->
+    <div class="page" id="page-events">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🎉 Events</span>
+        <button class="btn-sm btn-gold-sm" id="addEventBtn" onclick="openAddEvent()" style="display:none">+ Add</button>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0"><div id="eventsList"><div class="empty-msg">No events yet</div></div></div>
+      </div>
+    </div><!-- /events -->
+
+    <!-- PAGE: BIRTHDAYS -->
+    <div class="page" id="page-birthdays">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🎂 Birthdays</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0 0 14px">
+          <div class="card-title">🎂 This Month's Birthdays</div>
+          <div id="birthdayList"></div>
+        </div>
+      </div>
+    </div><!-- /birthdays -->
+
+    <!-- PAGE: NEWS -->
+    <div class="page" id="page-news">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📰 News & Updates</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0"><div id="newsList"></div></div>
+      </div>
+    </div><!-- /news -->
+
+    <!-- PAGE: NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">🔔 Notifications</span>
+      </div>
+      <div style="padding:14px">
+        <div class="white-card" style="margin:0"><div id="notifList"></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: REPORTS (ADMIN) -->
+    <div class="page" id="page-reports">
+      <div class="inner-header">
+        <button class="inner-back" onclick="goPage('home')">←</button>
+        <span class="inner-title">📊 Admin Panel</span>
+      </div>
+      <div style="padding:14px">
+        <div class="icon-grid" style="margin-bottom:14px">
+          <div class="icon-tile" onclick="switchAdminTab('stats')"><div class="icon-tile-box tile-blue" style="width:60px;height:60px;font-size:1.6rem">📊</div><div class="icon-tile-label">Overview</div></div>
+          <div class="icon-tile" onclick="switchAdminTab('members')"><div class="icon-tile-box tile-green" style="width:60px;height:60px;font-size:1.6rem">👥</div><div class="icon-tile-label">Manage Members</div></div>
+          <div class="icon-tile" onclick="switchAdminTab('announce')"><div class="icon-tile-box tile-rose" style="width:60px;height:60px;font-size:1.6rem">📣</div><div class="icon-tile-label">Announce</div></div>
+          <div class="icon-tile" onclick="switchAdminTab('export')"><div class="icon-tile-box tile-amber" style="width:60px;height:60px;font-size:1.6rem">📥</div><div class="icon-tile-label">Export</div></div>
+          <div class="icon-tile" onclick="switchAdminTab('leaderboard')"><div class="icon-tile-box tile-purple" style="width:60px;height:60px;font-size:1.6rem">🏆</div><div class="icon-tile-label">Leaderboard</div></div>
+          <div class="icon-tile" onclick="switchAdminTab('attendance')"><div class="icon-tile-box tile-teal" style="width:60px;height:60px;font-size:1.6rem">📋</div><div class="icon-tile-label">Att. Report</div></div>
+        </div>
+        <div id="adminTabContent"></div>
+      </div>
+    </div><!-- /reports -->
+
+    <!-- PAGE: ACCOUNT SETTINGS -->
+    <div class="page" id="page-account">
+      <div class="settings-header">Account Settings</div>
+      <div class="settings-user-card" id="settingsUserCard"></div>
+      <div class="settings-section">General</div>
+      <div class="settings-list">
+        <button class="settings-item" onclick="goPage('profile')">
+          <div class="settings-item-icon">👤</div><span class="settings-item-label">Profile</span><span class="settings-item-arrow">›</span>
+        </button>
+        <button class="settings-item" onclick="showAbout()">
+          <div class="settings-item-icon">ℹ️</div><span class="settings-item-label">About DBYC</span><span class="settings-item-arrow">›</span>
+        </button>
+        <button class="settings-item" onclick="goPage('notifications')">
+          <div class="settings-item-icon">🔔</div><span class="settings-item-label">Notifications</span><span class="settings-item-arrow">›</span>
+        </button>
+      </div>
+      <div class="settings-section">Account</div>
+      <div class="settings-list">
+        <button class="settings-item" onclick="openChangeUsername()">
+          <div class="settings-item-icon">🔑</div><span class="settings-item-label">Change Username</span><span class="settings-item-arrow">›</span>
+        </button>
+        <button class="settings-item" onclick="openChangePassword()">
+          <div class="settings-item-icon">🔐</div><span class="settings-item-label">Change Password</span><span class="settings-item-arrow">›</span>
+        </button>
+        <button class="settings-item" onclick="doLogout()">
+          <div class="settings-item-icon" style="background:#c62828">🔴</div><span class="settings-item-label">Logout</span><span class="settings-item-arrow">›</span>
+        </button>
+      </div>
+      <div style="height:20px"></div>
+    </div><!-- /account -->
+
+  </div><!-- /main-scroll -->
+
+  <!-- ── BOTTOM NAV ── -->
+  <div class="bottom-nav">
+    <button class="bottom-nav-btn active" id="bnav-home" onclick="goPage('home')">
+      <span class="bnav-icon">🏠</span><span class="bnav-label">Home</span>
+    </button>
+    <button class="bottom-nav-btn" id="bnav-members" onclick="goPage('members')">
+      <span class="bnav-icon">👥</span><span class="bnav-label">Members</span>
+    </button>
+    <button class="bottom-nav-btn" id="bnav-scanner" onclick="goPage('scanner')">
+      <span class="bnav-icon">📷</span><span class="bnav-label">Scan</span>
+    </button>
+    <button class="bottom-nav-btn" id="bnav-birthdays" onclick="goPage('birthdays')">
+      <span class="bnav-icon">🎂</span><span class="bnav-label">Birthdays</span>
+    </button>
+    <button class="bottom-nav-btn" id="bnav-account" onclick="goPage('account');renderAccount()">
+      <span class="bnav-icon">👤</span><span class="bnav-label">Profile</span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ╔══════════ SIDE DRAWER ══════════╗ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="toggleDrawer(false)">✕</button>
+  <div class="drawer-header">
+    <div id="drawerAvatar"></div>
+    <div>
+      <div class="drawer-user-name" id="drawerName">Loading...</div>
+      <div class="drawer-user-role" id="drawerRole"></div>
+      <div class="drawer-user-id" id="drawerId"></div>
+    </div>
+  </div>
+  <div class="drawer-scroll">
+    <div class="drawer-section-label">OPERATIONS</div>
+    <button class="drawer-item active" onclick="goPage('home');toggleDrawer(false)" id="di-home"><span class="drawer-item-icon">📊</span> Dashboard</button>
+    <button class="drawer-item" onclick="goPage('members');toggleDrawer(false)"><span class="drawer-item-icon">👥</span> Members Registry</button>
+    <button class="drawer-item" onclick="goPage('scanner');toggleDrawer(false)"><span class="drawer-item-icon">📷</span> QR Attendance</button>
+    <button class="drawer-item" onclick="goPage('qr');toggleDrawer(false)"><span class="drawer-item-icon">🪪</span> Member QR Passes</button>
+    <button class="drawer-item" onclick="goPage('idcard');toggleDrawer(false)"><span class="drawer-item-icon">🆔</span> ID Cards</button>
+    <div class="drawer-section-label">YOUTH LIFE & EVENTS</div>
+    <button class="drawer-item" onclick="goPage('birthdays');toggleDrawer(false)"><span class="drawer-item-icon">🎂</span> Birthday Celebrations</button>
+    <button class="drawer-item" onclick="goPage('events');toggleDrawer(false)"><span class="drawer-item-icon">📅</span> Event Calendar</button>
+    <button class="drawer-item" onclick="goPage('news');toggleDrawer(false)"><span class="drawer-item-icon">📰</span> DBYC News &amp; Updates<span class="drawer-item-badge" id="di-news-badge" style="display:none">0</span></button>
+    <button class="drawer-item" onclick="goPage('notifications');toggleDrawer(false)"><span class="drawer-item-icon">🔔</span> Notifications</button>
+    <button class="drawer-item" onclick="goPage('rules');toggleDrawer(false)"><span class="drawer-item-icon">📜</span> Rules &amp; Constitution</button>
+    <div class="drawer-section-label">MY ACCOUNT</div>
+    <button class="drawer-item" onclick="goPage('profile');toggleDrawer(false)"><span class="drawer-item-icon">👤</span> My Profile</button>
+    <button class="drawer-item" onclick="goPage('attendance');toggleDrawer(false)"><span class="drawer-item-icon">📋</span> Attendance Record</button>
+    <button class="drawer-item" onclick="goPage('points');toggleDrawer(false)"><span class="drawer-item-icon">⭐</span> Points &amp; Levels</button>
+    <button class="drawer-item" onclick="goPage('certificates');toggleDrawer(false)"><span class="drawer-item-icon">🏅</span> Certificates</button>
+    <div class="drawer-section-label" id="drawerAdminSection" style="display:none">ADMIN</div>
+    <button class="drawer-item" id="drawerAdminItem" style="display:none" onclick="goPage('reports');toggleDrawer(false)"><span class="drawer-item-icon">📊</span> Admin Panel</button>
+    <div class="drawer-section-label">ACCOUNT</div>
+    <button class="drawer-item" onclick="goPage('account');renderAccount();toggleDrawer(false)"><span class="drawer-item-icon">⚙️</span> Account Settings</button>
+    <button class="drawer-item" onclick="doLogout()"><span class="drawer-item-icon">🚪</span> Logout</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- DBYC Minutes Modal -->
+<div class="modal-overlay" id="minutesModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title">📝 Add Meeting Minutes</span>
+      <button class="modal-close" onclick="closeModal('minutesModal')">✕</button>
+    </div>
+    <div class="form-field"><label class="auth-label">Meeting Title *</label><input type="text" id="minTitle" class="auth-input" placeholder="e.g. Monthly Meeting"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="form-field"><label class="auth-label">Date *</label><input type="date" id="minDate" class="auth-input"></div>
+      <div class="form-field"><label class="auth-label">Group</label>
+        <select id="minGroup" class="auth-input">
+          <option value="All">All Groups</option>
+          <option value="Sub-Junior">Sub-Junior</option>
+          <option value="Junior">Junior</option>
+          <option value="Inter">Inter</option>
+          <option value="Super-Senior">Super-Senior</option>
+          <option value="Elder">Elder</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field"><label class="auth-label">Members Present</label><input type="number" id="minAttendees" class="auth-input" placeholder="0" min="0"></div>
+    <div class="form-field"><label class="auth-label">Agenda Items</label><textarea id="minAgenda" class="auth-input" style="min-height:80px;resize:vertical" placeholder="1. Opening prayer&#10;2. Last meeting review&#10;3. New business..."></textarea></div>
+    <div class="form-field"><label class="auth-label">Decisions / Resolutions</label><textarea id="minDecisions" class="auth-input" style="min-height:80px;resize:vertical" placeholder="Decisions made..."></textarea></div>
+    <div class="form-field"><label class="auth-label">Additional Notes</label><textarea id="minNotes" class="auth-input" style="min-height:55px;resize:vertical" placeholder="Other notes..."></textarea></div>
+    <button class="auth-btn" onclick="saveMinutes()">Save Minutes</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- DBYC News Modal -->
+<div class="modal-overlay" id="newsModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title" id="newsModalTitle">Post News</span>
+      <button class="modal-close" onclick="closeModal('newsModal')">✕</button>
+    </div>
+    <div class="form-field"><label class="auth-label">Title *</label><input type="text" id="newsTitle" class="auth-input" placeholder="News headline..."></div>
+    <div class="form-field"><label class="auth-label">Content *</label><textarea id="newsContent" class="auth-input" style="min-height:100px;resize:vertical" placeholder="Full news content..."></textarea></div>
+    <div class="form-field"><label class="auth-label">Category</label>
+      <select id="newsCategory" class="auth-input">
+        <option value="General">General</option>
+        <option value="Event">Event</option>
+        <option value="Announcement">Announcement</option>
+        <option value="Sports">Sports</option>
+        <option value="Prayer">Prayer</option>
+        <option value="Achievement">Achievement</option>
+        <option value="Alert">Alert</option>
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#1a237e;cursor:pointer;margin-bottom:14px">
+      <input type="checkbox" id="newsPinned" style="width:18px;height:18px;accent-color:#1a237e"> Pin to top
+    </label>
+    <button class="auth-btn" onclick="saveNews()">Publish News</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- ╔══════════ MODALS ══════════╗ -->
+
+<!-- Edit Profile / Add Member Modal -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title" id="memberModalTitle">Edit Profile</span>
+      <button class="modal-close-btn" onclick="closeModal('memberModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modalMemberId">
+      <div style="text-align:center;margin-bottom:14px">
+        <div class="photo-upload-box" onclick="document.getElementById('modalPhoto').click()" style="display:inline-block;padding:12px 20px">
+          <img id="modalPhotoPreview" style="display:none;width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid #1a237e;margin:0 auto 6px" alt="">
+          <div id="modalPhotoHint" style="font-size:0.78rem;color:#1565c0">📷 Upload Photo</div>
+        </div>
+        <input type="file" id="modalPhoto" accept="image/*" style="display:none" onchange="prevPhoto(this,'modalPhotoPreview','modalPhotoHint')">
+      </div>
+      <div class="form-field"><label class="form-label">Full Name *</label><input type="text" id="mfName" class="form-input"></div>
+      <div class="form-field"><label class="form-label">Date of Birth *</label><input type="date" id="mfDob" class="form-input"></div>
+      <div class="form-field"><label class="form-label">Mobile *</label><input type="tel" id="mfMobile" class="form-input"></div>
+      <div class="form-field"><label class="form-label">Email</label><input type="email" id="mfEmail" class="form-input"></div>
+      <div class="form-field"><label class="form-label">Address</label><textarea id="mfAddress" class="form-input" style="resize:vertical;min-height:60px"></textarea></div>
+      <div class="form-field" id="mfGroupWrap"><label class="form-label">Group</label>
+        <select id="mfGroup" class="form-select">
+          <option value="Sub-Junior">Sub-Junior (7-10)</option>
+          <option value="Junior">Junior (11-14)</option>
+          <option value="Senior">Senior (15-17)</option>
+          <option value="Inter">Inter (18-21)</option>
+          <option value="Super-Senior">Super-Senior (22-30)</option>
+          <option value="Elder">Elder (30+)</option>
+        </select>
+      </div>
+      <div class="form-field" id="mfRoleWrap"><label class="form-label">Role</label>
+        <select id="mfRole" class="form-select">
+          <option>Member</option><option>Leader</option><option>Incharge</option>
+          <option>Assistant Director</option><option>Director</option>
+        </select>
+      </div>
+      <div class="form-field"><label class="form-label">Password (leave blank = keep)</label><input type="password" id="mfPass" class="form-input" placeholder="New password..."></div>
+      <button class="btn-primary" onclick="saveMemberModal()">💾 Save</button>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Member Detail Modal -->
+<div class="modal-overlay" id="memberDetailModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title">Member Details</span>
+      <button class="modal-close-btn" onclick="closeModal('memberDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="memberDetailBody"></div>
+  </div>
+</div>
+
+<!-- Points Modal -->
+<div class="modal-overlay" id="pointsModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title">⭐ Award Points</span>
+      <button class="modal-close-btn" onclick="closeModal('pointsModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ptsMemberId">
+      <div class="form-field"><label class="form-label">Points</label><input type="number" id="ptsAmount" class="form-input" value="10" min="1"></div>
+      <div class="form-field"><label class="form-label">Reason</label><input type="text" id="ptsReason" class="form-input" placeholder="Reason for award"></div>
+      <button class="btn-primary" onclick="doAwardPoints()">⭐ Award</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title">📅 Add Event</span>
+      <button class="modal-close-btn" onclick="closeModal('eventModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field"><label class="form-label">Event Title</label><input type="text" id="evTitle" class="form-input" placeholder="Event name"></div>
+      <div class="form-field"><label class="form-label">Date</label><input type="date" id="evDate" class="form-input"></div>
+      <div class="form-field"><label class="form-label">Description</label><textarea id="evDesc" class="form-input" style="resize:vertical;min-height:70px" placeholder="Details..."></textarea></div>
+      <button class="btn-primary" onclick="saveEvent()">💾 Save Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="changePwModal">
+  <div class="modal-sheet">
+    <div class="modal-drag"></div>
+    <div class="modal-title-row">
+      <span class="modal-title">🔐 Change Password</span>
+      <button class="modal-close-btn" onclick="closeModal('changePwModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field"><label class="form-label">Current Password</label><input type="password" id="cpCurrent" class="form-input"></div>
+      <div class="form-field"><label class="form-label">New Password</label><input type="password" id="cpNew" class="form-input"></div>
+      <div class="form-field"><label class="form-label">Confirm New Password</label><input type="password" id="cpConfirm" class="form-input"></div>
+      <button class="btn-primary" onclick="doChangePassword()">🔐 Change</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
